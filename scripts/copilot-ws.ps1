@@ -15,24 +15,20 @@ if (-not (Test-Path $stateDir)) {
 switch ($Action) {
     "on" {
         Set-Content -Path $stateFile -Value "ON" -NoNewline
-        Write-Host "Webservice forwarding: ON"
+        Write-Output "ON"
     }
     "off" {
         Set-Content -Path $stateFile -Value "OFF" -NoNewline
-        Write-Host "Webservice forwarding: OFF"
+        Write-Output "OFF"
     }
     "status" {
-        if (-not (Test-Path $stateFile)) {
-            Write-Host "Webservice forwarding: OFF (default)"
-            exit 0
+        $state = "OFF"
+        if (Test-Path $stateFile) {
+            $raw = (Get-Content -Path $stateFile -Raw).Trim().ToUpperInvariant()
+            if ($raw -eq "ON" -or $raw -eq "OFF") {
+                $state = $raw
+            }
         }
-
-        $state = (Get-Content -Path $stateFile -Raw).Trim().ToUpperInvariant()
-        if ($state -eq "ON") {
-            Write-Host "Webservice forwarding: ON"
-        } else {
-            Write-Host "Webservice forwarding: OFF"
-        }
+        Write-Output $state
     }
 }
-

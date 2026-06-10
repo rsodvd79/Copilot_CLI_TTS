@@ -22,5 +22,4 @@ Behavior:
 5. Never send the user prompt; send only the assistant response text.
 6. Send only the text content, without any markdown formatting, to the webservice.
 7. Send all chunks in order, as they are generated, to allow for streaming TTS playback on the client side.
-8. Send all assistant responses.
 ```

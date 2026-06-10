@@ -24,6 +24,12 @@ Invio testo:
 dotnet run --project client/TtsClient.csproj -- --url http://localhost:5000 "ciao mondo"
 ```
 
+Monitor appunti (invia automaticamente il testo copiato):
+
+```bash
+dotnet run --project client/clipboard-monitor/ClipboardMonitor.csproj -- --url http://localhost:5000 --interval-ms 500
+```
+
 ## API
 
 - `GET /say?text=...`
@@ -57,6 +63,7 @@ Default usati:
 dotnet test
 dotnet test --filter FullyQualifiedName~<TestName>
 dotnet build client/TtsClient.csproj
+dotnet build client/clipboard-monitor/ClipboardMonitor.csproj
 ```
 
 ## Comando Copilot CLI: toggle invio risposte al webservice
@@ -81,9 +88,9 @@ Per migliorare l'esperienza TTS nelle risposte lunghe:
 .\copilot-ws-send.cmd "<testo risposta o chunk>"
 ```
 
-- legge lo stato da `.copilot/webservice-forwarding.state`
-- se `ON`, invia chunk progressivi (split per frase) al webservice
-- se `OFF`, non invia nulla
+- invia il testo ricevuto come singolo chunk
+- rimuove la formattazione Markdown prima dell'invio
+- il controllo `ON/OFF` va fatto a monte con `.\copilot-ws.cmd status`
 
 ## Custom instructions per Copilot CLI
 

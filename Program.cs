@@ -167,6 +167,9 @@ sealed class SpeechWorker : BackgroundService
             RedirectStandardError = true,
             UseShellExecute = false,
             CreateNoWindow = true,
+            // Piper si aspetta input UTF-8: senza questo, su Windows lo stdin
+            // usa la codepage di console e le lettere accentate si perdono.
+            StandardInputEncoding = new System.Text.UTF8Encoding(false),
             WorkingDirectory = Path.GetDirectoryName(_options.ExecutablePath)
                 ?? AppContext.BaseDirectory
         };
