@@ -73,6 +73,18 @@ Usa questo comando dal root del repository:
 - `ON`: Copilot deve inoltrare il testo della propria risposta al webservice
 - `OFF`: nessun inoltro automatico
 
+### Invio progressivo a chunk
+
+Per migliorare l'esperienza TTS nelle risposte lunghe:
+
+```bash
+.\copilot-ws-send.cmd "<testo risposta o chunk>"
+```
+
+- legge lo stato da `.copilot/webservice-forwarding.state`
+- se `ON`, invia chunk progressivi (split per frase) al webservice
+- se `OFF`, non invia nulla
+
 ## Custom instructions per Copilot CLI
 
 - File pronto all'uso: `CUSTOM_INSTRUCTIONS.md`

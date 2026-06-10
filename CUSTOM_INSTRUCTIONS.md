@@ -15,9 +15,12 @@ Persistent state file:
 
 Behavior:
 1. Before sending a user-facing response, read `.copilot/webservice-forwarding.state`.
-2. If value is `ON`, send the exact assistant response text to the webservice with:
-   dotnet run --project client/TtsClient.csproj -- "<assistant response text>"
-3. If value is `OFF` (or missing), do not send response text to the webservice.
-4. Never send the user prompt; send only the assistant response text.
+2. If value is `ON`, send assistant output in progressive chunks (1-2 sentences each), as soon as each chunk is ready:
+   .\copilot-ws-send.cmd "<chunk text>"
+3. For very short replies, a single chunk is fine.
+4. If value is `OFF` (or missing), do not send response text to the webservice.
+5. Never send the user prompt; send only the assistant response text.
+6. Send only the text content, without any markdown formatting, to the webservice.
+7. Send all chunks in order, as they are generated, to allow for streaming TTS playback on the client side.
+8. Send all assistant responses.
 ```
-

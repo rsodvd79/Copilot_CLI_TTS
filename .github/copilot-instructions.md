@@ -50,6 +50,15 @@ Use the repository command below to control whether Copilot should send its own 
   `dotnet run --project client/TtsClient.csproj -- "<assistant response text>"`
 - If the value is `OFF` (or file missing), Copilot should not forward response text.
 
+For progressive TTS while generating longer replies, use chunk forwarding:
+
+```bash
+.\copilot-ws-send.cmd "<chunk text>"
+```
+
+- The script checks `.copilot/webservice-forwarding.state` and sends only when `ON`.
+- It splits long text by sentence and forwards chunks incrementally.
+
 ## Custom instructions source
 
 - Use `CUSTOM_INSTRUCTIONS.md` as the canonical copy/paste block for Copilot CLI custom instructions.
