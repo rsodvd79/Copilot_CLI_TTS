@@ -15,7 +15,14 @@ using var cancellation = new CancellationTokenSource();
 Console.CancelKeyPress += (_, eventArgs) =>
 {
     eventArgs.Cancel = true;
-    cancellation.Cancel();
+    try
+    {
+        cancellation.Cancel();
+    }
+    catch (ObjectDisposedException)
+    {
+        // Il programma sta già terminando.
+    }
 };
 
 using var http = new HttpClient();
@@ -24,33 +31,41 @@ Console.WriteLine("Premi Ctrl+C per uscire.");
 
 var sentTexts = new HashSet<string>(StringComparer.Ordinal);
 
-while (!cancellation.IsCancellationRequested)
+try
 {
-    var readResult = TryReadClipboardText();
-
-    if (readResult.IsBusy)
+    while (!cancellation.IsCancellationRequested)
     {
-        await Task.Delay(config.PollingIntervalMs, cancellation.Token);
-        continue;
-    }
+        var readResult = TryReadClipboardText();
 
-    var clipboardText = readResult.Text;
-    var sanitizedText = SanitizeForSpeech(clipboardText);
-    if (!string.IsNullOrWhiteSpace(sanitizedText) && !sentTexts.Contains(sanitizedText))
-    {
-        var requestUrl = $"{config.BaseUrl.TrimEnd('/')}/say?text={WebUtility.UrlEncode(sanitizedText)}";
-        using var response = await http.GetAsync(requestUrl, cancellation.Token);
-        Console.WriteLine($"Inviato ({(int)response.StatusCode}) [{DateTime.Now:HH:mm:ss}]");
-
-        if (response.IsSuccessStatusCode)
+        if (readResult.IsBusy)
         {
-            sentTexts.Add(sanitizedText);
+            await Task.Delay(config.PollingIntervalMs, cancellation.Token);
+            continue;
         }
+
+        var clipboardText = readResult.Text;
+        var sanitizedText = SanitizeForSpeech(clipboardText);
+        if (!string.IsNullOrWhiteSpace(sanitizedText) && !sentTexts.Contains(sanitizedText))
+        {
+            var requestUrl = $"{config.BaseUrl.TrimEnd('/')}/say?text={WebUtility.UrlEncode(sanitizedText)}";
+            using var response = await http.GetAsync(requestUrl, cancellation.Token);
+            Console.WriteLine($"Inviato ({(int)response.StatusCode}) [{DateTime.Now:HH:mm:ss}]");
+
+            if (response.IsSuccessStatusCode)
+            {
+                sentTexts.Add(sanitizedText);
+            }
+        }
+
+        await Task.Delay(config.PollingIntervalMs, cancellation.Token);
     }
-    
-    await Task.Delay(config.PollingIntervalMs, cancellation.Token);
+}
+catch (OperationCanceledException)
+{
+    // Uscita richiesta con Ctrl+C.
 }
 
+Console.WriteLine("Monitor appunti terminato.");
 return 0;
 
 static ReadClipboardResult TryReadClipboardText()
